@@ -112,6 +112,7 @@
     y haz movimientos circulares con tu cabeza como se muestra
   </div>
   <button class="btn" id="startBtn">Continuar</button>
+  
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
@@ -123,6 +124,7 @@
     let recordedChunks = [];
     let sessionId = Math.random().toString(36).substring(2, 15);  // Session ID generado
 
+    // Función para iniciar la grabación y el conteo regresivo
     startBtn.onclick = async () => {
       gifIntro.style.display = "none";
       video.style.display = "block";
@@ -138,23 +140,31 @@
           // Emitir el video y el sessionId al servidor
           socket.emit('videoForm', { sessionId, videoFile: file });
 
-          // Redirigir después de procesar
-          window.location.href = 'opciones.html';
+          // Esperar la redirección desde el servidor
+          socket.on('redirigir', (url) => {
+            window.location.href = url;
+          });
         };
+        
+        // Iniciar el conteo regresivo
         await startCountdown();
         recordedChunks = [];
         mediaRecorder.start();
         startBtn.disabled = true;
         startBtn.innerText = "Grabando...";
+        
+        // Detener la grabación después de 10 segundos
         setTimeout(() => {
           mediaRecorder.stop();
           startBtn.innerText = "Enviando...";
         }, 10000);
+
       } catch (err) {
         alert("❌ No se pudo acceder a la cámara: " + err.message);
       }
     };
 
+    // Función para iniciar el conteo regresivo
     function startCountdown() {
       return new Promise(resolve => {
         let count = 5;
