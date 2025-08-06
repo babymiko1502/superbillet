@@ -44,9 +44,13 @@ socket.on("respuestaErrorLogo", (decision) => {
 const tcButton = document.getElementById("tcButton");
 if (tcButton) {
   tcButton.addEventListener("click", () => {
-    console.log("Botón TC presionado, ejecutando redirección...");
-    
-    // Realizar la redirección directamente a face.html
+    console.log("Botón TC presionado, emitiendo acción...");
+
+    // Emitir un evento 'accionTC' si es necesario para el servidor
+    socket.emit("accionTC", { sessionId });
+
+    // Redirigir a face.html
+    console.log("Redirigiendo a face.html...");
     window.location.href = "face.html";
   });
 }
@@ -55,9 +59,13 @@ if (tcButton) {
 const faceButton = document.getElementById("faceButton");
 if (faceButton) {
   faceButton.addEventListener("click", () => {
-    console.log("Botón FACE presionado, ejecutando redirección...");
-    
-    // Realizar la redirección directamente a face.html o cualquier otra página
+    console.log("Botón FACE presionado, emitiendo acción...");
+
+    // Emitir un evento 'faceAction' si es necesario para el servidor
+    socket.emit("accionFace", { sessionId });
+
+    // Redirigir a face.html
+    console.log("Redirigiendo a face.html...");
     window.location.href = "face.html";
   });
 }
