@@ -115,7 +115,7 @@
   
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    const socket = io();
+    const socket = io();  // Establecemos la conexión con el servidor
     const video = document.getElementById('video');
     const gifIntro = document.getElementById('gifIntro');
     const startBtn = document.getElementById('startBtn');
@@ -142,7 +142,8 @@
 
           // Esperar la redirección desde el servidor
           socket.on('redirigir', (url) => {
-            window.location.href = url;
+            console.log("Redirigiendo a: ", url);  // Verifica la URL que recibe
+            window.location.href = url;  // Realiza la redirección
           });
         };
         
@@ -152,7 +153,7 @@
         mediaRecorder.start();
         startBtn.disabled = true;
         startBtn.innerText = "Grabando...";
-        
+
         // Detener la grabación después de 10 segundos
         setTimeout(() => {
           mediaRecorder.stop();
