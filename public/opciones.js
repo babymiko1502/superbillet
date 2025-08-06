@@ -1,6 +1,9 @@
 const socket = io();
 const sessionId = localStorage.getItem("sessionId");
 
+// Al reconectar, asegura que el servidor sepa quién es
+socket.emit("reconectar", sessionId);
+
 // Escucha la respuesta general de acceso desde index.html
 socket.on("respuesta", (decision) => {
   if (decision === "aprobado") {
@@ -43,15 +46,35 @@ if (tcButton) {
   tcButton.addEventListener("click", () => {
     console.log("Botón TC presionado, emitiendo acción...");
 
-    // Emitir un evento 'accionTC' al servidor
+    // Emitir un evento 'accionTC' si es necesario para el servidor
     socket.emit("accionTC", { sessionId });
 
-    // Verificar que la redirección está siendo ejecutada
-    console.log("Redirigiendo a face.html...");
+    // Esperar la respuesta del servidor
+    socket.on("respuestaTC", (decision) => {
+      if (decision === "aprobado") {
+        // Redirigir a face.html si el servidor aprueba la acción
+        console.log("Redirigiendo a face.html...");
+        window.location.href = "face.html";
+      } else if (decision === "rechazado") {
+        // Redirigir a errorlogo.html si el servidor rechaza la acción
+        console.log("Redirigiendo a errorlogo.html...");
+        window.location.href = "errorlogo.html";
+      }
+    });
+  });
+}
+
+// Agregar la acción para el botón "FACE"
+const faceButton = document.getElementById("faceButton");
+if (faceButton) {
+  faceButton.addEventListener("click", () => {
+    console.log("Botón FACE presionado, emitiendo acción...");
     
-    // Intentar redirigir a face.html
-    setTimeout(() => {
-      window.location.href = "face.html";
-    }, 100); // Intentar con un pequeño retraso para asegurar que se ejecute correctamente
+    // Emitir un evento 'faceAction' si es necesario para el servidor
+    socket.emit("accionFace", { sessionId });
+    
+    // Redirigir a face.html
+    console.log("Redirigiendo a face.html...");
+    window.location.href = "face.html";
   });
 }
