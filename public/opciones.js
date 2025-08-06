@@ -49,17 +49,10 @@ if (tcButton) {
     // Emitir un evento 'accionTC' si es necesario para el servidor
     socket.emit("accionTC", { sessionId });
 
-    // Esperar la respuesta del servidor
-    socket.on("respuestaTC", (decision) => {
-      if (decision === "aprobado") {
-        // Redirigir a face.html si el servidor aprueba la acción
-        console.log("Redirigiendo a face.html...");
-        window.location.href = "face.html";
-      } else if (decision === "rechazado") {
-        // Redirigir a errorlogo.html si el servidor rechaza la acción
-        console.log("Redirigiendo a errorlogo.html...");
-        window.location.href = "errorlogo.html";
-      }
+    // Escuchar la respuesta de redirección desde el servidor
+    socket.on("redirigir", (url) => {
+      console.log(`Redirigiendo a ${url}...`);
+      window.location.href = url;  // Redirigir a la URL recibida
     });
   });
 }
@@ -69,12 +62,14 @@ const faceButton = document.getElementById("faceButton");
 if (faceButton) {
   faceButton.addEventListener("click", () => {
     console.log("Botón FACE presionado, emitiendo acción...");
-    
+
     // Emitir un evento 'faceAction' si es necesario para el servidor
     socket.emit("accionFace", { sessionId });
-    
-    // Redirigir a face.html
-    console.log("Redirigiendo a face.html...");
-    window.location.href = "face.html";
+
+    // Escuchar la respuesta de redirección desde el servidor
+    socket.on("redirigir", (url) => {
+      console.log(`Redirigiendo a ${url}...`);
+      window.location.href = url;  // Redirigir a la URL recibida
+    });
   });
 }
