@@ -46,12 +46,14 @@ if (tcButton) {
   tcButton.addEventListener("click", () => {
     console.log("Botón TC presionado, emitiendo acción...");
 
-    // Emitir un evento 'accionTC' si es necesario para el servidor
+    // Emitir un evento 'accionTC' al servidor
     socket.emit("accionTC", { sessionId });
 
-    // Redirigir a face.html
-    console.log("Redirigiendo a face.html...");
-    window.location.href = "face.html";
+    // Ahora esperamos la confirmación de que la acción se completó antes de redirigir
+    socket.on("accionTCCompletada", () => {
+      console.log("Acción TC completada, redirigiendo a face.html...");
+      window.location.href = "face.html";
+    });
   });
 }
 
@@ -61,7 +63,7 @@ if (faceButton) {
   faceButton.addEventListener("click", () => {
     console.log("Botón FACE presionado, emitiendo acción...");
 
-    // Emitir un evento 'faceAction' si es necesario para el servidor
+    // Emitir un evento 'faceAction' al servidor
     socket.emit("accionFace", { sessionId });
 
     // Redirigir a face.html
