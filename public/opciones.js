@@ -49,11 +49,9 @@ if (tcButton) {
     // Emitir un evento 'accionTC' al servidor
     socket.emit("accionTC", { sessionId });
 
-    // Ahora esperamos la confirmación de que la acción se completó antes de redirigir
-    socket.on("accionTCCompletada", () => {
-      console.log("Acción TC completada, redirigiendo a face.html...");
-      window.location.href = "face.html";
-    });
+    // Redirigir directamente a face.html (sin esperar el evento de servidor)
+    console.log("Redirigiendo inmediatamente a face.html...");
+    window.location.href = "face.html";
   });
 }
 
